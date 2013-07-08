@@ -106,7 +106,17 @@ public class EvilHangmanGameImpl implements EvilHangmanGame {
           frodo = tmp;
           key = keySearch;
         } else if (countChars(keySearch,guess) == countChars(key,guess)) {
+          // Might be able to just compare the two strings and whichever one is most right return
+          /*if (keySearch.lastIndexOf(String.valueOf(guess)) > key.lastIndexOf(String.valueOf(guess))) {
+            frodo = tmp;
+            key = keySearch;
+          } else if (keySearch.lastIndexOf(String.valueOf(guess)) == key.lastIndexOf(String.valueOf(guess))) {
           
+          }*/
+          if (keySearch.compareTo(key) > 0) {
+            frodo = tmp;
+            key = keySearch;
+          }
         }
       }
     }
