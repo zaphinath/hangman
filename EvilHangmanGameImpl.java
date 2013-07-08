@@ -3,19 +3,24 @@ package hangman;
 import java.io.File;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.HashMap;
 //import java.util.List;
 //import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.lang.StringBuilder;
+import java.util.Iterator;
+
 
 public class EvilHangmanGameImpl implements EvilHangmanGame {
   //private List<Character> guessedChars;	
   private StringBuilder guessedChars;
-  private HashSet<String> dict;
+  private Set<String> dict;
 	private boolean[] chars;
   private int remainingGuesses;  
   private StringBuilder secretWord; // This is the winning world  
+  
+  
   /* Constructor 
    * Set up array of 26 to know which chars have been used;
    */
@@ -56,8 +61,74 @@ public class EvilHangmanGameImpl implements EvilHangmanGame {
 	 * has already been guessed in this game.
 	 */
 	public Set<String> makeGuess(char guess) throws GuessAlreadyMadeException {
-    HashSet setSets = new HashSet<HashSet<String>>();
-    return null;
+    HashMap<String, HashSet<String>> setSets = new HashMap<String, HashSet<String>>();
+    // iterate through the current set of words; make a pattern based off char
+    // positions in the current word and if it exists in the hashmap then add, else 
+    // make a new hashset and insert it
+    Iterator<String> it = dict.iterator();
+    while (it.hasNext()) {
+      String word = it.next();
+      StringBuilder tmp = new StringBuilder(word);
+      for (int i = 0; i < tmp.length(); i++) {
+        char ch = tmp.charAt(i);
+        if (ch != guess) {
+          tmp.setCharAt(i, '-');
+        }
+      }
+      if (setSets.containsKey(tmp.toString())) {
+        setSets.get(tmp.toString()).add(word);
+      //  System.out.println("CONTAINS Key "+tmp);
+      } else {
+        setSets.put(tmp.toString(), new HashSet<String>());
+        setSets.get(tmp.toString()).add(word);
+      }
+    }
+    Iterator<String> bilbo = setSets.keySet().iterator();
+    HashSet<String> frodo = new HashSet<String>();
+    String key = "";
+    while (bilbo.hasNext()) {
+      String keySearch = bilbo.next();
+      //System.out.println("KEY = "+keySearch + " Size: "+ setSets.get(keySearch).size());
+      HashSet<String> tmp = setSets.get(keySearch);
+      if (tmp.size() > frodo.size()) {
+        frodo = tmp;
+        key = keySearch;
+        //System.out.println("frodo replaced by tmp");
+      } else if (tmp.size() == frodo.size()) {
+        /* 1. Choose group which no letters appear
+         * 2. Choose with fewest letters.
+         * 3. Choose rightmost letter (repeat if needed)
+         */
+        if (!keySearch.contains(String.valueOf(guess))) {
+          frodo = tmp;
+          key = keySearch;
+        } else if (countChars(keySearch,guess) > countChars(key,guess)) {
+          frodo = tmp;
+          key = keySearch;
+        } else if (countChars(keySearch,guess) == countChars(key,guess)) {
+          
+        }
+      }
+    }
+    // if key returned has only '-----' then print letter not found
+    if (key.contains(String.valueOf(guess)) == false) {
+      System.out.println("Sorry, there are no "+guess+"'s");
+    } else {
+      // else 
+      // update guessed word based off what is guessed here.
+      // and print found letter
+      StringBuilder k = new StringBuilder(key);
+      int numChar = 0;
+      for (int i = 0; i < secretWord.length(); i++ ) {
+        char ch = k.charAt(i);
+        if (ch != '-') {
+          secretWord.setCharAt(i, ch);
+          numChar++;
+        }
+      }
+      System.out.println("Yes, there is (are) " + numChar + " " + guess);
+    }
+    return frodo;
   }
 
   public char getCharInput() {
@@ -96,7 +167,22 @@ public class EvilHangmanGameImpl implements EvilHangmanGame {
       System.out.println("Word: " + secretWord.toString());
       char guess = getCharInput();
       System.out.println(guess); 
+      try {
+        dict = makeGuess(guess);  
+        //System.out.println(dict.toString());
+      } catch (GuessAlreadyMadeException e) {
+        e.printStackTrace();
+      }
+      if (!(secretWord.toString().contains(String.valueOf('-')))) {
+      //win
+        System.out.println("You Win!");
+        System.out.println("The correct word is "+secretWord);
+        System.exit(-9);
+      }
     }
+    System.out.println("You lose!");
+    String[] foo = dict.toArray(new String[dict.size()]);
+    System.out.println("The word was: "+foo[0]);
   }
 
   private void loadDictionary(File dictionary, int wordLength) {
@@ -117,8 +203,16 @@ public class EvilHangmanGameImpl implements EvilHangmanGame {
     } catch (FileNotFoundException e) {
       System.out.println("No Such File");
     }
-
   }
 
+  private int countChars(String haystack, char needle) {
+    int count = 0;
+    for (int i = 0; i < haystack.length(); i++) {
+      if (haystack.charAt(i) == needle) {
+        count++;
+      }
+    }
+    return count;
+  }
 	
 }
