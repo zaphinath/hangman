@@ -77,7 +77,6 @@ public class EvilHangmanGameImpl implements EvilHangmanGame {
       }
       if (setSets.containsKey(tmp.toString())) {
         setSets.get(tmp.toString()).add(word);
-      //  System.out.println("CONTAINS Key "+tmp);
       } else {
         setSets.put(tmp.toString(), new HashSet<String>());
         setSets.get(tmp.toString()).add(word);
@@ -88,12 +87,10 @@ public class EvilHangmanGameImpl implements EvilHangmanGame {
     String key = "";
     while (bilbo.hasNext()) {
       String keySearch = bilbo.next();
-      //System.out.println("KEY = "+keySearch + " Size: "+ setSets.get(keySearch).size());
       HashSet<String> tmp = setSets.get(keySearch);
       if (tmp.size() > frodo.size()) {
         frodo = tmp;
         key = keySearch;
-        //System.out.println("frodo replaced by tmp");
       } else if (tmp.size() == frodo.size()) {
         /* 1. Choose group which no letters appear
          * 2. Choose with fewest letters.
@@ -102,18 +99,11 @@ public class EvilHangmanGameImpl implements EvilHangmanGame {
         if (!keySearch.contains(String.valueOf(guess))) {
           frodo = tmp;
           key = keySearch;
-        } else if (countChars(keySearch,guess) > countChars(key,guess)) {
+        } else if (countChars(keySearch,guess) < countChars(key,guess)) {
           frodo = tmp;
           key = keySearch;
         } else if (countChars(keySearch,guess) == countChars(key,guess)) {
-          // Might be able to just compare the two strings and whichever one is most right return
-          /*if (keySearch.lastIndexOf(String.valueOf(guess)) > key.lastIndexOf(String.valueOf(guess))) {
-            frodo = tmp;
-            key = keySearch;
-          } else if (keySearch.lastIndexOf(String.valueOf(guess)) == key.lastIndexOf(String.valueOf(guess))) {
-          
-          }*/
-          if (keySearch.compareTo(key) > 0) {
+          if (key.compareTo(keySearch) > 0) {
             frodo = tmp;
             key = keySearch;
           }
@@ -138,6 +128,7 @@ public class EvilHangmanGameImpl implements EvilHangmanGame {
       }
       System.out.println("Yes, there is (are) " + numChar + " " + guess);
     }
+    dict = frodo;
     return frodo;
   }
 
