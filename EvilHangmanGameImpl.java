@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.HashMap;
-//import java.util.List;
-//import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.lang.StringBuilder;
@@ -13,7 +11,6 @@ import java.util.Iterator;
 
 
 public class EvilHangmanGameImpl implements EvilHangmanGame {
-  //private List<Character> guessedChars;	
   private StringBuilder guessedChars;
   private Set<String> dict;
 	private boolean[] chars;
@@ -170,7 +167,6 @@ public class EvilHangmanGameImpl implements EvilHangmanGame {
       System.out.println(guess); 
       try {
         dict = makeGuess(guess);  
-        //System.out.println(dict.toString());
       } catch (GuessAlreadyMadeException e) {
         e.printStackTrace();
       }
@@ -192,7 +188,6 @@ public class EvilHangmanGameImpl implements EvilHangmanGame {
         System.out.println("Dictionary Empty");
         System.exit(-9);
       }
-      //guessedChars = new ArrayList<Character>();
       dict = new HashSet<String>();
       Scanner sc = new Scanner(dictionary);
       while (sc.hasNext()) {
